@@ -12,9 +12,13 @@ from snmp import poll
 from snmp import snmp_manager
 from snmp import snmp_info
 from web import ws_device
+import urllib.request
+import os
 
 # import sys
 # from pprint import pprint
+
+OUI_URL = 'http://standards-oui.ieee.org/oui.txt'
 
 
 def main():
@@ -127,6 +131,37 @@ def do_poll(config, verbose=False):
     """
     # Poll
     poll.snmp(config, verbose)
+
+
+def do_oui(config, verbose = False):
+    """
+
+    Converts the groups of addresses that are assigned to NIC manufacturers based on the first 3 bytes of the address
+    into a YAML file stored in data/aux in directory
+
+    :param config:
+    :param verbose:
+    :return: None
+    """
+
+    # uncomment if attempting to read from url
+    # response = urllib.request.urlopen(OUI_URL)
+
+    print('Reading OUI data from url:{}'.format(OUI_URL))
+
+    # This is a very timely(>10 mins) operation reading from local cache instead
+    # data = response.read()
+
+    cache_file_path = '{}/infoset/bin/oui_cache.txt'.format(os.getcwd())
+    oui_lines = []
+    with open(cache_file_path,'r') as file_data:
+        for line in file_data:
+            oui_lines.append(line)
+
+    for index in range(0, len(oui_lines)):
+        pass
+
+
 
 
 if __name__ == "__main__":
