@@ -62,6 +62,9 @@ class Cli(object):
         # Parse "test", return object used for parser
         _cli_test(subparsers, width=width)
 
+        # Parse "oui", return object used for parser
+        _oui_mac_addresses(subparsers, width=width)
+
         # Return the CLI arguments
         args = parser.parse_args()
 
@@ -240,4 +243,28 @@ def _cli_pagemaker(subparsers, width=80):
         default=False,
         help=textwrap.fill(
             'Verbose Output.', width=width)
+    )
+
+
+def _oui_mac_addresses(subparsers, width=80):
+    """
+
+    :param subparsers: Subparsers Object
+    :param width: Width of the help text string to STDIO before wrapping
+    :return: None
+    """
+    # Initialize key variables
+    parser = subparsers.add_parser(
+        'oui',
+        help=textwrap.fill(
+            'Get vendor OUI MAC addresses.', width=width)
+    )
+
+    parser.add_argument(
+        '--inet',
+        action='store_true',
+        required=False,
+        default=False,
+        help=textwrap.fill(
+            'Refresh OUI text file.', width=width)
     )

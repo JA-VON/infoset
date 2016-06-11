@@ -57,7 +57,7 @@ Utility script for the project.
 
     # Get vendor OUI MAC addresses
     if cli_args.mode == 'oui':
-        do_oui(config, cli_args.verbose)
+        do_oui(cli_args, config)
 
 
 def do_config(cli_args, config):
@@ -131,7 +131,7 @@ def do_poll(config, verbose=False):
     poll.snmp(config, verbose)
 
 
-def do_oui(config, verbose=False):
+def do_oui(cli_args, config):
     """
 
     Converts the groups of addresses that are assigned to NIC manufacturers based on the first 3 bytes of the address
@@ -142,22 +142,26 @@ def do_oui(config, verbose=False):
     :return: None
     """
 
-    # uncomment if attempting to read from url
-    # response = urllib.request.urlopen(OUI_URL)
-
-    # print('Reading OUI data from url:{}'.format(OUI_URL))
-
-    # This is a very timely(>10 mins) operation reading from local cache instead
-    # data = response.read()
-
-    print('Reading OUI MAC Address data from local cache file in bin')
     oui_data = {}
-    with open(CACHE_FILE_PATH, 'r') as file_data:
-        for line in file_data:
+    if cli_args.inet is True:
+        print('Reading OUI data from url:{}'.format(OUI_URL))
+        response = urllib.request.urlopen(OUI_URL)
+        # This is a very timely(>10 mins) operation
+        data = response.read()
+        data = data.split("\n")
+        for line in data:
             hex_value = line[:6]
             if all(x in string.hexdigits for x in hex_value):
                 organization = line[6:].replace("(base 16)", "").strip().title()
                 oui_data[hex_value.lower()] = organization
+    else:
+        print('Reading OUI MAC Address data from local cache file in bin')
+        with open(CACHE_FILE_PATH, 'r') as file_data:
+            for line in file_data:
+                hex_value = line[:6]
+                if all(x in string.hexdigits for x in hex_value):
+                    organization = line[6:].replace("(base 16)", "").strip().title()
+                    oui_data[hex_value.lower()] = organization
     file_location = '{}/data/aux/{}'.format(os.getcwd(), OUI_YAML_FILE_NAME)
     with open(file_location, 'wt+') as f:
         yaml.dump(oui_data, f, default_flow_style=False)
