@@ -13,7 +13,11 @@ from infoset.snmp import snmp_info
 from infoset.web import ws_device
 
 import sys
+import os
 import yaml
+
+sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.getcwd())
 
 
 def main():
@@ -50,6 +54,10 @@ Utility script for the project.
     # Create pages
     if cli_args.mode == 'pagemaker':
         do_pages(config, cli_args.verbose)
+
+    # Get vendor OUI MAC addresses
+    if cli_args.mode == 'oui':
+        do_oui(config, cli_args.verbose)
 
 
 def do_config(cli_args, config):
@@ -122,6 +130,37 @@ def do_poll(config, verbose=False):
     # Poll
     poll.snmp(config, verbose)
 
+
+def do_oui(config, verbose=False):
+    """
+
+    Converts the groups of addresses that are assigned to NIC manufacturers based on the first 3 bytes of the address
+    into a YAML file stored in data/aux in directory
+
+    :param config:
+    :param verbose:
+    :return: None
+    """
+
+    # uncomment if attempting to read from url
+    # response = urllib.request.urlopen(OUI_URL)
+
+    # print('Reading OUI data from url:{}'.format(OUI_URL))
+
+    # This is a very timely(>10 mins) operation reading from local cache instead
+    # data = response.read()
+
+    print('Reading OUI MAC Address data from local cache file in bin')
+    oui_data = {}
+    with open(CACHE_FILE_PATH, 'r') as file_data:
+        for line in file_data:
+            hex_value = line[:6]
+            if all(x in string.hexdigits for x in hex_value):
+                organization = line[6:].replace("(base 16)", "").strip().title()
+                oui_data[hex_value.lower()] = organization
+    file_location = '{}/data/aux/{}'.format(os.getcwd(), OUI_YAML_FILE_NAME)
+    with open(file_location, 'wt+') as f:
+        yaml.dump(oui_data, f, default_flow_style=False)
 
 if __name__ == "__main__":
     main()
