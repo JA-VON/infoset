@@ -155,6 +155,17 @@ $ bin/toolbox.py pagemaker --directory etc/
 
 Your webserver will now be able to access the newest HTML in `$WEB_DIRECTORY`.
 
+## Update Vendor MAC Addresses
+inet flag will load from http://standards-oui.ieee.org/oui.txt, note this is a timely operation, there is a local cache of the file
+excluding the inet tag will instead load the MAC Addresses from this file.
+
+This command will execute against all configured hosts and create appropriate HTML files in the configuration file's `$WEB_DIRECTORY` directory
+```
+$ bin/toolbox.py oui --inet
+```
+
+Vendor MAC address can now be queried using the Oui class in the jm_lib directory.
+
 # Next Steps
 There are many dragons to slay and kingdoms to conquer!
 ## Contribute

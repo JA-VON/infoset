@@ -4,20 +4,32 @@ Calico utility script
 
 from pprint import pprint
 
-from infoset.cli import jm_cli
-from infoset.configuration import jm_configuration
+# needed this to execute from the command line, otherwise received an ImportError
+# import os, sys
+# sys.path.insert(0, os.path.abspath(".."))
+
+from infoset.interfaces import jm_cli
+from infoset.utils import jm_configuration
 from infoset.utils import jm_general
 from infoset.snmp import poll
 from infoset.snmp import snmp_manager
 from infoset.snmp import snmp_info
 from infoset.web import ws_device
 
-import sys
-import os
+import string
+import urllib.request
 import yaml
+import os
+import sys
 
 sys.path.insert(0, os.path.abspath('..'))
 sys.path.insert(0, os.getcwd())
+
+OUI_URL = 'http://standards-oui.ieee.org/oui.txt'
+OUI_YAML_FILE_NAME = "oui_data.yaml"
+
+CACHE_FILE_PATH = '{}/bin/oui.txt'.format(os.getcwd())
+FILE_LOCATION = '{}/data/aux/{}'.format(os.getcwd(), OUI_YAML_FILE_NAME)
 
 
 def main():
@@ -102,8 +114,8 @@ def do_test(cli_args, config):
     else:
         # Error, host problems
         log_message = (
-            'Uncontactable host %s or no valid SNMP '
-            'credentials found for it.') % (cli_args.host)
+                          'Uncontactable host %s or no valid SNMP '
+                          'credentials found for it.') % (cli_args.host)
         jm_general.logit(1006, log_message)
 
 
@@ -162,9 +174,9 @@ def do_oui(cli_args, config):
                 if all(x in string.hexdigits for x in hex_value):
                     organization = line[6:].replace("(base 16)", "").strip().title()
                     oui_data[hex_value.lower()] = organization
-    file_location = '{}/data/aux/{}'.format(os.getcwd(), OUI_YAML_FILE_NAME)
-    with open(file_location, 'wt+') as f:
+    with open(FILE_LOCATION, 'wt+') as f:
         yaml.dump(oui_data, f, default_flow_style=False)
+
 
 if __name__ == "__main__":
     main()

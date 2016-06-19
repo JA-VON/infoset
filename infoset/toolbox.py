@@ -5,6 +5,10 @@ Calico utility script
 
 import yaml
 
+# needed this to execute from the command line, otherwise received an ImportError
+# import os, sys
+# sys.path.insert(0, os.path.abspath(".."))
+
 import interfaces
 from utils import ConfigReader
 from utils import jm_general
@@ -12,6 +16,7 @@ from snmp import poll
 from snmp import snmp_manager
 from snmp import snmp_info
 from web import ws_device
+
 import urllib.request
 import string
 import os
@@ -22,6 +27,7 @@ OUI_URL = 'http://standards-oui.ieee.org/oui.txt'
 OUI_YAML_FILE_NAME = "oui_data.yaml"
 
 CACHE_FILE_PATH = '{}/bin/oui.txt'.format(os.getcwd())
+FILE_LOCATION = '{}/data/aux/{}'.format(os.getcwd(), OUI_YAML_FILE_NAME)
 
 
 def main():
@@ -152,7 +158,7 @@ def do_oui(cli_args, config):
     """
 
     oui_data = {}
-    if cli_args.inet is True:
+    if cli_args.inet:
         print('Reading OUI data from url:{}'.format(OUI_URL))
         response = urllib.request.urlopen(OUI_URL)
         # This is a very timely(>10 mins) operation
@@ -171,8 +177,7 @@ def do_oui(cli_args, config):
                 if all(x in string.hexdigits for x in hex_value):
                     organization = line[6:].replace("(base 16)", "").strip().title()
                     oui_data[hex_value.lower()] = organization
-    file_location = '{}/data/aux/{}'.format(os.getcwd(), OUI_YAML_FILE_NAME)
-    with open(file_location, 'wt+') as f:
+    with open(FILE_LOCATION, 'wt+') as f:
         yaml.dump(oui_data, f, default_flow_style=False)
 
 
