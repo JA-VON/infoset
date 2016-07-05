@@ -88,17 +88,17 @@ class Interact:
         self.snmp_params = snmp_parameters
 
         # Fail if snmp_parameters dictionary is empty
+        if not snmp_parameters:
+            log_message = ('SNMP parameters provided are blank. '
+                           'Non existent host?')
+            jm_general.logit(1005, log_message, True)
+
+        # Fail if snmp_parameters dictionary is empty
         if snmp_parameters['snmp_version'] is None:
             log_message = (
                 'SNMP version is "None". Non existent host? - %s'
                 '') % (snmp_parameters['snmp_hostname'])
             jm_general.logit(1004, log_message, True)
-
-        # Fail if snmp_parameters dictionary is empty
-        if not snmp_parameters:
-            log_message = ('SNMP parameters provided are blank. '
-                           'Non existent host?')
-            jm_general.logit(1005, log_message, True)
 
     def enterprise_number(self):
         """Return SNMP enterprise number for the device.

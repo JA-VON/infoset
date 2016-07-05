@@ -1,3 +1,5 @@
+.idea
+
 #ignore luke's code-style test object script
 test.py
 # Ignore all vim / vi temporary files
